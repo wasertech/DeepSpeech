@@ -9,7 +9,7 @@ from multiprocessing import Pool
 import progressbar
 import sox
 
-import unidecode
+
 from deepspeech_training.util.downloader import SIMPLE_BAR, maybe_download
 from deepspeech_training.util.importers import (
     get_counter,
@@ -19,13 +19,15 @@ from deepspeech_training.util.importers import (
     print_import_report,
 )
 
+
+#https://storage.googleapis.com/public-datasets-mswc/mswc.tar.gz
 FIELDNAMES = ["wav_filename", "wav_filesize", "transcript"]
 SAMPLE_RATE = 16000
 MAX_SECS = 15
-ARCHIVE_NAME = "2019-04-11_fr_FR"
+ARCHIVE_NAME = "mswc"
 ARCHIVE_DIR_NAME = "ts_" + ARCHIVE_NAME
 ARCHIVE_URL = (
-    "https://deepspeech-storage-mirror.s3.fr-par.scw.cloud/" + ARCHIVE_NAME + ".zip"
+    "https://storage.googleapis.com/public-datasets-mswc/" + ARCHIVE_NAME + ".tar.gz"
 )
 
 
@@ -117,7 +119,7 @@ def _maybe_convert_sets(target_dir, extracted_data, english_compatible=False):
     for line in data:
         line["path"] = os.path.join(extracted_dir, line["path"])
 
-    num_samples = len(data)
+   num_samples = len(data)
     rows = []
     counter = get_counter()
 
@@ -192,12 +194,12 @@ def cleanup_transcript(text, english_compatible=False):
     text = PUNCTUATIONS_REG.sub(" ", text)
     text = MULTIPLE_SPACES_REG.sub(" ", text)
     if english_compatible:
-        text = unidecode.unidecode(text)
+        text = str(text)
     return text.strip().lower()
 
 
 def handle_args():
-    parser = get_importers_parser(description="Importer for TrainingSpeech dataset.")
+    parser = get_importers_parser(description="Importer for MSWC dataset.")
     parser.add_argument(dest="target_dir")
     parser.add_argument(
         "--english-compatible",
@@ -211,4 +213,4 @@ def handle_args():
 if __name__ == "__main__":
     cli_args = handle_args()
     validate_label = get_validate_label(cli_args)
-    _download_and_preprocess_data(cli_args.target_dir, cli_args.english_compatible)
+    _download_and_preprocess_data(cli_args.target_dir, cli_args.english_compatible) 
